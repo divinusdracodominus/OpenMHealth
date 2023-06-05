@@ -12,7 +12,6 @@ class Metric {
     public Uri uri;
     public String[] fields;
     public String remoteurl = "https://example.com";
-
     public String usage = "This permission is used to collect engagement metrics please see docs for more details";
     public Metric(String name, String permission, String uri, String[] fields) {
         this.name = name;

@@ -31,6 +31,17 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+
+import android.Manifest;
+import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.os.Environment;
+import android.util.Log;
+import android.view.View;
+import android.view.ViewGroup;
+
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -45,6 +56,9 @@ import com.google.android.gms.common.util.Hex;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import androidx.appcompat.app.AppCompatActivity;
+
+import org.json.JSONArray;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -58,6 +72,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.UUID;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+
 
 public class DataManager extends AppCompatActivity {
 
@@ -177,7 +195,6 @@ public class DataManager extends AppCompatActivity {
 
                 HashMap<String, String> msgMap = new HashMap();
                 JSONObject json =new JSONObject();
-
                 for(int idx=0;idx<cursor.getColumnCount();idx++)
                 {
                     String field = cursor.getColumnName(idx);
