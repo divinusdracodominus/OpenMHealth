@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8"> 
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <title>Sleep Tracker</title>
+        <meta name="Sleep Tracker" content="Sleep Health">
+
+        <link rel= "stylesheet" href= "{{ url_for('static',filename='/css/state.css') }}">
+    </head> 
+
+<body>
+    <div class="main"> <!-- Main -->
+
+        <div class="top-container">
+            <div class="main-tittle"> <h2> Sleep Tracker </h2> </div>
+            <!-- <div class="date-time"><p> Time | Date  </p></div>  -->
+        </div>   
+
+        <p class="font-style"> Check the box(s) for any of the followings (before going to bed):</p>
+
+        <form action="/sleepform" method="post">
+
+            <div class="messages">
+                <div class="messages-text">
+                    <input type="checkbox" name="sleep_sex" id="sleep_sex" value="sleep_sex"> <!-- Q1 -->
+                    <label for="sleep_sex"> Sex 5 hours before </label><br><br>
+                </div>
+            </div>
+
+            <div class="messages">
+                <div class="messages-text">
+                    <input type="checkbox" name="sleep_exercise" id="sleep_exercise" value="sleep_exercise"> <!-- Q1 -->
+                    <label for="sleep_exercise"> Exercise 3 hours before going to bed </label><br><br>
+                </div>
+            </div>
+
+            <div class="messages">
+                <div class="messages-text">
+                    <input type="checkbox" name="sleep_bath_one" id="sleep_bath_one" value="sleep_bath_one"> <!-- Q2 -->
+                    <label for="sleep_bath_one"> #1 (bathroom) 1 hour before going to bed </label><br><br>
+                </div>
+            </div>
+
+            <div class="messages">
+                <div class="messages-text">
+                    <input type="checkbox" name="sleep_bath_two" id="sleep_bath_two" value="sleep_bath_two"> <!-- Q3 -->
+                    <label for="sleep_bath_two"> #2 (bathroom) 1 hour before going to bed </label><br><br>
+                </div>
+            </div>
+
+            <div class="messages">
+                <div class="messages-text">
+                    <input type="checkbox" name="sleep_home" id="sleep_home" value="sleep_home"> <!-- Q4 -->
+                    <label for="sleep_home"> Sleeping at home? </label><br><br>
+                </div>
+            </div>
+            
+            <div class="messages">
+                <div class="messages-text">
+                    <input type="checkbox" name="sleep_slept_day" id="sleep_slept_day" value="sleep_slept_day"> <!-- Q5 -->
+                    <label for="sleep_slept_day"> Slept during the day? </label><br><br>
+                </div>
+            </div>
+            
+            <div class="messages">
+                <div class="messages-text">
+                    <input type="checkbox" name="sleep_screen" id="sleep_screen" value="sleep_screen"> <!-- Q6 -->
+                    <label for="sleep_screen"> Use/watch computer, mobile device, or tv 1 hour before </label><br><br>
+                </div>
+            </div>
+            
+            <div class="messages">
+                <div class="messages-text">
+                    <input type="checkbox" name="sleep_meds" id="sleep_meds" value="sleep_meds"> <!-- Q7 -->
+                    <label for="sleep_meds"> Take vitamin/medicine 3 hours before </label><br><br>
+                </div>
+            </div>
+            
+            <div class="messages">
+                <div class="messages-text">
+                    <input type="checkbox" name="sleep_drink" id="sleep_drink" value="sleep_drink"> <!-- Q8 -->
+                    <label for="sleep_drink"> Drink alcohol 3 hours before </label><br><br>
+                </div>
+            </div>
+            
+            <div class="messages">
+                <div class="messages-text">
+                    <input type="checkbox" name="sleep_drive" id="sleep_drive" value="sleep_drive"> <!-- Q9 -->
+                    <label for="sleep_drive"> Drive an hour before </label><br><br>
+                </div>
+            </div>
+            
+            <div class="messages">
+                <div class="messages-text">
+                    <input type="checkbox" name="sleep_work" id="sleep_work" value="sleep_work"> <!-- Q10 -->
+                    <label for="sleep_work"> Work an hour before </label><br><br>
+                </div>
+            </div>
+            
+            <div class="messages">
+                <div class="messages-text">
+                    <input type="checkbox" name="sleep_alarm" id="sleep_alarm" value="sleep_alarm"> <!-- Q11 -->
+                    <label for="sleep_alarm"> Setup an alarm </label><br><br>
+                </div>
+            </div>
+            
+            <div class="messages">
+                <div class="messages-text">
+                    <input type="checkbox" name="sleep_eat" id="sleep_eat" value="sleep_eat"> <!-- Q12 -->
+                    <label for="sleep_eat"> Ate 3 hours before</label><br><br>
+                </div>
+            </div>
+            
+            <div class="messages">
+                <div class="messages-text">
+                    <input type="checkbox" name="unknown_x" id="unknown_x" value="unknown_x"> <!-- Q12 -->
+                    <label for="unknown_x"> Unknow variable </label><br><br>
+                </div>
+            </div>
+            
+            <div class="button-div">
+                <input class="submitButton" type="submit" value="Submit">
+            </div>
+        </form>
+
+    </div> <!-- Main -->
+
+    <!-- Navigation bar-->
+    <div class="navbar" style="font-family:Verdana;">
+        <div id="menu" class="menu">
+            <a href="/"> Home </a>
+            <a href=""> | </a>
+            <a href="/wba-wakeup"> Wakeup </a>
+        </div>
+    </div>
+
+</body>
+</html>
+

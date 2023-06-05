@@ -1,0 +1,221 @@
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans&display=swap');
+/* @import url('https://fonts.googleapis.com/css2?family=Fredoka&display=swap'); */
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@500&display=swap');
+
+* {
+  box-sizing: border-box;
+  margin:0;
+  padding:0;
+}
+body {
+	margin: 0;
+	height: 100%;
+  min-height:150vh;
+	/* background-image: linear-gradient(to top, #d9afd9 0%, #97d9e1 100%); */
+  /* background-image: linear-gradient(to top, #9947ea 0%, #37bbca 100%); */
+  background-image: linear-gradient(to top, #9af3fd 0%, #14909e 100%);
+	background-repeat: no-repeat;
+  background-size: cover;
+  background-attachment: fixed;
+}
+.main {
+  max-width: 710px;
+  margin: 0 auto;
+  padding: 40px;
+  margin-top: 20px;
+  /* margin-bottom: 45px; */
+}
+
+.main-tittle {
+  text-align: center;
+  margin-left: -1%;
+  font-family: "Oswald", Arial, sans-serif;
+  font-size: large;
+}
+
+.date-time {
+  /*background-color: #1d1b1b52;
+  border-radius: 15px;
+   height: 80px;
+    opacity: 0.5;
+   padding: 10px 10px 10px 10px;
+  */
+  border-color: #000000;
+  margin-right: auto;
+  margin-left: -1%;
+  overflow: hidden;
+  z-index: 9999;
+  width: 100%;
+  text-align: center;
+   opacity: 0.8;
+   font-size: 14px;
+   font-family: Verdana;
+   color: #333131;
+   line-height: 15px;
+   margin-top: 0;
+   margin-bottom: 0;
+}
+
+.mid-container {
+  /* width: 800px; */
+  flex-direction: column;
+  justify-content:space-between;
+ /* border: 1px solid black; */
+ text-align: center;
+ margin-left: -1%;
+}
+
+.quantity, .quality, .avarage, .score {
+  display: inline-block;
+  width: 300px;
+  height: 200px;
+  text-align: center;
+  margin: 10px;
+  padding: 50px;
+  margin-left: -1%;
+    /* border: 1px solid black; */
+}
+
+.sleep-metric-font,.sleep-metric-score {
+  /* font-family: 'Open Sans', sans-serif; */
+   font-family: 'Noto Sans JP', sans-serif;
+   font-weight: 600;
+   font-size: 25px;
+   line-height: 40px;
+   color: #000000;  
+}
+.sleep-metric-font {
+   color: #000000;  
+}
+.sleep-metric-score {
+  color: white;
+}
+
+/* ------------------------------------------------------------------- */
+/* Navigation bar */
+
+.navbar {
+  overflow: hidden;
+  opacity: 0.5;
+  background-color: #000000;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 9999;
+  height: 80px;
+  width: 100%;
+}
+
+.menu {
+  display: flex;
+  justify-content: center;
+  text-align: center;
+  margin: 0 auto;
+  /*  max-width: 710px; */
+}
+
+.navbar a, .menu a {
+/* 
+  display: block;
+*/
+  color: #ffffff;
+  padding: 16px 16px;
+  text-decoration: none;
+  font-size: 17px;
+  line-height: 50px;
+  height: 80px; 
+}
+
+.navbar a:hover, .navbar a:target {
+  color: #7ce4f0;
+  /*color: rgb(48, 47, 47);*/
+}
+
+/* END Navigation bar */
+/* ------------------------------------------------------------------- */
+
+
+
+/* Side Navigation */
+
+/* Menu button to open */
+.menu-button-open {
+  position: absolute;
+  right: 20px;
+  top: 20px;
+}
+
+
+.mychart-coatainer {
+  margin-left: 0px;
+  margin-right: 0;
+  padding-right: 0px;
+  padding-left: 8px;
+  position: relative;
+  height: 112vh;
+  /* height: 100px; */
+ margin-bottom: 80px;
+ /* padding-bottom: 0px; */
+  /* width:100vw; */
+
+ /* 
+   padding-bottom: 40%;
+ float: left; 
+    position: fixed;
+  overflow: hidden;
+    height: 400px;
+        display: inline-block;
+ 
+ */
+  margin-left: -10px;
+}
+
+
+
+
+/* 
+
+@media only screen and (max-width:800px) {
+    .main {
+      width: 80%;
+      padding: 10px;
+
+    }
+    .right {
+      width: 100%;
+    }
+  }
+  
+  @media only screen and (max-width:500px) {
+    .menu, .navbar, .main, .right {
+      width: 100%;
+    }
+
+    .submitButton {
+      border: none;
+      display: block;
+      text-align: center;
+      cursor: pointer;
+      text-transform: uppercase;
+      outline: none;
+      overflow: hidden;
+      position: relative;
+      color: #fff;
+      font-weight: 700;
+      font-size: 15px;
+      background-color: #78c7d2;
+      padding: 17px 60px;
+      margin: 0 auto;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.20);
+    }
+    
+      
+    .submitButton a:hover, .submitButton a:target {
+      color: rgb(48, 47, 47);
+    }
+    
+
+
+
+  } */

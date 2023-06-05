@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8"> 
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <title>Sleep Tracker</title>
+        <meta name="Sleep Tracker" content="Sleep Health">
+
+        <link rel="stylesheet" href="{{ url_for('static',filename='/css/index.css') }}">
+        <script type= "text/javascript" src = "{{ url_for('static', filename='js/index.js') }}" type="module" defer></script> 
+        <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script> <!-- Import Chart.js -->
+    </head> 
+
+<body>
+    <div class="main"> <!-- Main -->
+
+        <div class="top-container">
+            <div class="main-tittle"> <h2> Sleep Tracker </h2> </div>
+            <!-- <div class="date-time"><p> Time | Date  </p></div>  -->
+        </div>
+
+        <div class="mid-container">    
+            <div class="quantity">          
+                <p class="sleep-metric-font">Quantity <br /> </p>
+                <p class="sleep-metric-score" id="idQuantity"> </p>
+            </div>          
+        
+            <div class="quality">
+                <p class="sleep-metric-font"> Quality <br />  </p>
+                <p class="sleep-metric-score" id="idQuality"> </p>
+            </div>
+
+            <div class="avarage">
+                <p class="sleep-metric-font"> Week Average <br /> </p>
+                <p class="sleep-metric-score" id="idWeekAverageHours"> </p>
+            </div>
+
+            <div class="score">
+                <p class="sleep-metric-font"> Sleep Score <br />   </p>
+                <p class="sleep-metric-score" id="idScore"> </p>
+            </div>
+        </div>
+        
+        <!-- Navigation bar-->
+        <div class="navbar" style="font-family:Verdana;">
+            <div id="menu" class="menu">
+                <a href="/wba-sleep"> Sleep </a>
+                <a href=""> | </a>
+                <a href="/wba-wakeup"> Wakeup </a>
+            </div>
+        </div>
+    </div> <!-- Main -->
+
+    <div class="mychart-coatainer"> <!-- mychart container -->
+        <canvas id="myChart"></canvas> <!-- Canvas element -->
+    </div>
+
+</body>
+    <script defer>
+        var chartLabels = JSON.parse( {{ labels | tojson }} );
+        var chartData = JSON.parse( {{ data | tojson }} );
+        var sleepQuality = "{{ sleep_quality_str|safe }}";    
+    </script>
+</html>

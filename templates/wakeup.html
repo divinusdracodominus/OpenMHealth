@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8"> 
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <title>Sleep Tracker</title>
+        <meta name="Sleep Tracker" content="Sleep Health">
+
+        <link rel= "stylesheet" href= "{{ url_for('static',filename='/css/state.css') }}">
+    </head> 
+
+<body>
+    <div class="main"> <!-- Main -->
+        
+        <div class="top-container">
+            <div class="main-tittle"> <h2> Sleep Tracker </h2> </div>
+            <!-- <div class="date-time"><p> Time | Date  </p></div>  -->
+        </div> 
+        
+        <p class="font-style"> Check the box(s) for any of the followings (after working performed):</p>
+
+        <form action="/wakeupform" method="post">
+            
+            <div class="messages">
+                <div class="messages-text">
+                    <input type="checkbox" name="wakeup_dream" id="wakeup_dream" value="wakeup_dream"> <!-- Q1 -->
+                    <label for="wakeup_dream"> Any dream(s) </label><br><br>
+                </div>
+            </div>
+            
+            <div class="messages">
+                <div class="messages-text">
+                    <input type="checkbox" name="wakeup_alarm" id="wakeup_alarm" value="wakeup_alarm" > <!--Q2 -->
+                    <label for="wakeup_alarm"> Wake up with an alarm </label>
+                </div>
+            </div>
+            
+            <p class="font-style">How was your sleep's quality:</p>
+
+            <div class="messages">
+                <div class="messages-text">
+                    <input type="radio" name="sleep_quality" id="sleep_quality" value="Bad"> <!-- R1 -->
+                    <label for="sleep_quality"> Sleep quality - Bad </label><br><br>
+                </div>
+            </div>
+            
+            <div class="messages">
+                <div class="messages-text">
+                    <input type="radio" name="sleep_quality" id="sleep_quality" value="Good"> <!-- R2 -->
+                    <label for="sleep_quality"> Sleep quality - Good </label><br><br>
+                </div>
+            </div>
+            
+            <div class="messages">
+                <div class="messages-text">
+                    <input type="radio" name="sleep_quality" id="sleep_quality" value="Deep"> <!-- R3 -->
+                    <label for="sleep_quality"> Sleep quality - Deep </label><br><br>
+                </div>
+            </div>
+            
+            <div class="button-div">
+                <input class="submitButton" type="submit" value="Submit">
+            </div>
+            
+        </form>
+        
+    </div> <!-- Main -->
+
+    <!-- Navigation bar-->
+    <div class="navbar" style="font-family:Verdana;">
+        <div id="menu" class="menu">
+            <a href="/"> Home </a>
+            <a href=""> | </a>
+            <a href="/wba-sleep"> Sleep </a>
+        </div>
+
+</body>
+</html>
+
