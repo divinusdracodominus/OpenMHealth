@@ -11,6 +11,7 @@ import androidx.core.content.ContextCompat;
 
 import android.app.Activity;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -19,6 +20,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.security.Permission;
 
 public class PermissionRequest extends AppCompatActivity {
 
@@ -42,49 +45,46 @@ public class PermissionRequest extends AppCompatActivity {
         accept.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                requestPermission(permission);
+                requestPermission(PermissionRequest.this, getApplicationContext(), permission);
             }
         });
 
         reject.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                handle_result(false);
+                handle_result(PermissionRequest.this, permission, false);
             }
         });
-        requestPermission(permission);
+        requestPermission(this, getApplicationContext(), permission);
     }
     private ActivityResultLauncher<String> requestPermissionLauncher =
         registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
             if (isGranted) {
                 Log.i("OpenmHealth", "permission granted");
-                handle_result(true);
+
             } else {
                 Log.i("OpenmHealth", "permission is not granted");
 
             }
         });
-    void requestPermission(String permission) {
+    void requestPermission(PermissionRequest activity, Context context, String permission) {
 
         if (ContextCompat.checkSelfPermission(
-                getApplicationContext(), permission) ==
+                context, permission) ==
                 PackageManager.PERMISSION_GRANTED) {
-            handle_result(true);
+            handle_result(activity  , permission,true);
         } else {
-            // You can directly ask for the permission.
-            // The registered ActivityResultCallback gets the result of this request.
-
-            requestPermissionLauncher.launch(
+            activity.requestPermissionLauncher.launch(
                     permission);
         }
     }
 
-    public void handle_result(boolean granted) {
+    public static void handle_result(PermissionRequest activity, String permission, boolean granted) {
         Intent res = new Intent();
         res.putExtra("action", "permission request");
         res.putExtra("permission", permission);
         res.putExtra("granted", granted);
-        setResult(Activity.RESULT_OK, res);
-        this.finish();
+        activity.setResult(Activity.RESULT_OK, res);
+        activity.finish();
     }
 }
