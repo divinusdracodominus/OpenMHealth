@@ -52,7 +52,7 @@ import java.util.Set;
 import java.util.UUID;
 import com.google.android.material.navigation.NavigationView;
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+public class MainActivity extends AppCompatActivity {
 
     final int PERMISSION_REQUEST = 2252;
     NavigationView navView;
@@ -85,18 +85,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             editor.putString("device_id", UUID.randomUUID().toString());
         }
 
-        Button smsBtn = findViewById(R.id.smspermissionbtn);
-        smsBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.i("OpenMhealth", "button clicked");
-
-                Intent i = new Intent(MainActivity.this, DataManager.class);
-                startActivity(i);
-            }
-        });
         navView = findViewById(R.id.nav_view);
-        navView.setNavigationItemSelectedListener(this);
+        navView.setNavigationItemSelectedListener(new MenuListener(this, navView));
 
     }
 
@@ -105,36 +95,4 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         super.onStart();
     }
 
-    @SuppressWarnings("StatementWithEmptyBody")
-    @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
-        navView.setVisibility(View.GONE);
-        // Handle navigation view item clicks here.
-        int id = item.getItemId();
-
-        if (id == R.id.nav_gallery) {
-
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_results) {
-
-            // Create an intent to open the file explorer
-            Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-            intent.setType("*/*"); // Set the MIME type to allow all file types
-            intent.addCategory(Intent.CATEGORY_OPENABLE);
-
-            // Start the activity with the created intent
-            startActivity(Intent.createChooser(intent, "Select File"));
-
-
-        } else if (id == R.id.nav_metrics) {
-
-        } else if (id == R.id.nav_events) {
-
-        }
-
-        //DrawerLayout drawer = (DrawerLayout) findViewById(R.id.nav_view);
-        //drawer.closeDrawer(GravityCompat.START);
-        return true;
-    }
 }

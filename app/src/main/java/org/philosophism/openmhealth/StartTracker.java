@@ -3,6 +3,7 @@ package org.philosophism.openmhealth;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+import androidx.navigation.NavAction;
 
 import android.Manifest;
 import android.app.PendingIntent;
@@ -11,6 +12,8 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,11 +26,13 @@ import com.google.android.gms.location.SleepSegmentRequest;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.navigation.NavigationView;
 
 import org.philosophism.openmhealth.activitytracker;
 
 public class StartTracker extends AppCompatActivity {
 
+    NavigationView navView;
     List<ActivityTransition> transitions = new ArrayList<>();
     PendingIntent sleepPendingIntent;
     private final String tag = "MHealth StartTracker";
@@ -85,28 +90,19 @@ public class StartTracker extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start_tracker);
 
+        navView = (NavigationView) findViewById(R.id.nav_view);
+        navView.setNavigationItemSelectedListener(new MenuListener(this, navView));
 
-        transitions.add(
-                new ActivityTransition.Builder()
-                        .setActivityType(DetectedActivity.IN_VEHICLE)
-                        .setActivityTransition(ActivityTransition.ACTIVITY_TRANSITION_ENTER)
-                        .build());
-
-        transitions.add(
-                new ActivityTransition.Builder()
-                        .setActivityType(DetectedActivity.IN_VEHICLE)
-                        .setActivityTransition(ActivityTransition.ACTIVITY_TRANSITION_EXIT)
-                        .build());
-
-        transitions.add(
-                new ActivityTransition.Builder()
-                        .setActivityType(DetectedActivity.WALKING)
-                        .setActivityTransition(ActivityTransition.ACTIVITY_TRANSITION_EXIT)
-                        .build());
-
-        ActivityTransitionRequest request = new ActivityTransitionRequest(transitions);
-
-
-
+        Button menuBtn = findViewById(R.id.open_menu);
+        menuBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(navView.getVisibility() == View.GONE) {
+                    navView.setVisibility(View.VISIBLE);
+                }else{
+                    navView.setVisibility(View.GONE);
+                }
+            }
+        });
     }
 }
