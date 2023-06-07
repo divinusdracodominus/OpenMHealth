@@ -8,6 +8,7 @@ import static android.database.Cursor.FIELD_TYPE_STRING;
 
 import org.philosophism.openmhealth.Metric;
 
+import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
@@ -16,6 +17,7 @@ import androidx.core.content.ContextCompat;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -23,6 +25,8 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.FileUtils;
+import android.os.Looper;
 import android.provider.CalendarContract;
 import android.provider.ContactsContract;
 import android.util.Log;
@@ -63,6 +67,7 @@ import org.json.JSONArray;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
@@ -84,24 +89,37 @@ public class DataManager extends AppCompatActivity {
 
     SharedPreferences sharedPref;
     ParticipantData participant;
-    Metric metric;
-    String filename;
+    Uri filename;
+    Metric current = null;
+
+    private final ActivityResultLauncher getDirLauncher = registerForActivityResult(
+            new ActivityResultContracts.CreateDocument(),
+            uri -> {
+                if (uri != null) {
+                    // call this to persist permission across decice reboots
+                    getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                    handle_data(uri, current, participant);
+
+                } else {
+                    // request denied by user
+                }
+            }
+    );
 
     private ActivityResultLauncher<String> requestPermissionLauncher =
             registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
                 if (isGranted) {
                     Log.i("OpenmHealth", "permission granted");
-                    handle_data(filename, metric, participant);
+                    getDirLauncher.launch(null);
                 } else {
                     Log.i("OpenmHealth", "permission is not granted");
                     /// should show reason why its required
                 }
             });
 
-    Metric current = null;
     Metric[] metric_list = new Metric[]{
-            new Metric("incoming SMS", Manifest.permission.READ_SMS, "content://sms/inbox", new String[]{"date", "date_sent", "thread_id", "address", "body"}),
-            new Metric("call log", Manifest.permission.READ_CALL_LOG, "content://call_log/calls",
+            new Metric("incoming_SMS", Manifest.permission.READ_SMS, "content://sms/inbox", new String[]{"date", "date_sent", "thread_id", "address", "body"}),
+            new Metric("calllog", Manifest.permission.READ_CALL_LOG, "content://call_log/calls",
                     new String[]{"number", "date", "duration"}),
             new Metric("calendar", Manifest.permission.READ_CALENDAR, "content://com.android.calendar/events",
                     new String[] {
@@ -112,7 +130,7 @@ public class DataManager extends AppCompatActivity {
                             "eventLocation",
                             "selfAttendeeStatus"
                     }),
-            new Metric("outgoing SMS", Manifest.permission.READ_SMS, "content://sms/sent", new String[]{"date", "date_sent", "thread_id", "_id", "address", "body"})
+            new Metric("outgoing_SMS", Manifest.permission.READ_SMS, "content://sms/sent", new String[]{"date", "date_sent", "thread_id", "_id", "address", "body"})
     };
     boolean[] accepted = new boolean[metric_list.length];
 
@@ -120,12 +138,16 @@ public class DataManager extends AppCompatActivity {
 
     }
 
-    private void handle_data(String filename, Metric metric, ParticipantData data) {
+
+
+
+    private void handle_data(Uri filename, Metric metric, ParticipantData data) {
+        if(current == null) return;
         Cursor cursor = getContentResolver().query(metric.uri, metric.fields, null, null, null);
         AsyncTask.execute(new Runnable() {
             @Override
             public void run() {
-
+                Looper.prepare();
                 try {
                     UUID metadata_id = UUID.randomUUID();
                     JSONObject metadata = new JSONObject();
@@ -142,19 +164,19 @@ public class DataManager extends AppCompatActivity {
 
                     Log.i("OpenMHealth", "managed to make it to text point" + text);
 
-                    File file = new File(getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS) + "/" + filename);
-                    Log.i("OpenMHealth", "wrote data to file: " + getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS) + "myfile.json");
+                    OutputStream file = getContentResolver().openOutputStream(filename);
+                    Log.i("OpenMHealth", "wrote data to file: " + filename);
 
-                    FileOutputStream fileOutput = new FileOutputStream(file);
-                    OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fileOutput);
+                    OutputStreamWriter outputStreamWriter = new OutputStreamWriter(file);
                     outputStreamWriter.write(text);
                     outputStreamWriter.flush();
-                    fileOutput.getFD().sync();
+
                     outputStreamWriter.close();
                     //output.setText(newData.toString());
                 }catch(IOException e) {
-                    Log.e("OpenMHealth", "Error occured");
-                    Toast.makeText(getApplicationContext(), "Hello", Toast.LENGTH_SHORT).show();
+                    Log.e("OpenMHealth", "Error occured: " + e.getMessage());
+
+                    Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
 
                 }catch(JSONException e) {
                     Log.e("OpenMHealth", "Error occured");
@@ -256,17 +278,15 @@ public class DataManager extends AppCompatActivity {
 
 
         for(int i = 0; i < metric_list.length; i++) {
-            CheckBox btn = new CheckBox(this);
-            btn.setText(metric_list[i].name);
+            Button btn = new Button(this);
+            btn.setText("export " + metric_list[i].name);
             final int val = i;
-            btn.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            btn.setOnClickListener(new View.OnClickListener() {
                 @Override
-                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                    if(isChecked) {
-                        accepted[val] = true;
-                    }else {
-                        accepted[val] = false;
-                    }
+                public void onClick(View v) {
+                    current = metric_list[val];
+                    accepted[val] = true;
+                    requestPermission(metric_list[val]);
                 }
             });
             checklist.addView(btn);
@@ -277,11 +297,9 @@ public class DataManager extends AppCompatActivity {
         submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                for(int i = 0; i < accepted.length; i++) {
-                    if(accepted[i]) {
-                        handle_data(metric_list[i].name + ".txt", metric_list[i], participant);
-                    }
-                }
+                //startActivityForResult(Intent.createChooser(i, "Choose directory"), 9999);
+                Intent next = new Intent(DataManager.this, MainActivity.class);
+                startActivity(next);
             }
         });
 
@@ -340,18 +358,16 @@ public class DataManager extends AppCompatActivity {
         }
     }
 
-    void requestPermission(String permission, String filename, Metric metric, ParticipantData participant) {
+    void requestPermission(Metric metric) {
 
         if (ContextCompat.checkSelfPermission(
-                this, permission) ==
+                this, metric.permission) ==
                 PackageManager.PERMISSION_GRANTED) {
-            handle_data(filename, metric, participant);
+            getDirLauncher.launch(null);
         } else {
-            this.metric = metric;
-            this.participant = participant;
-            this.filename = filename;
+            
             requestPermissionLauncher.launch(
-                    permission);
+                    metric.permission);
         }
     }
 }

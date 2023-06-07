@@ -1,8 +1,17 @@
 package org.philosophism.openmhealth;
 
 import android.app.IntentService;
+import android.app.PendingIntent;
+import android.app.Service;
+import android.content.BroadcastReceiver;
 import android.content.Intent;
 import android.content.Context;
+
+import com.google.android.gms.location.SleepClassifyEvent;
+import com.google.android.gms.location.SleepSegmentEvent;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * An {@link IntentService} subclass for handling asynchronous task requests in
@@ -12,82 +21,28 @@ import android.content.Context;
  * TODO: Customize class - update intent actions, extra parameters and static
  * helper methods.
  */
-public class activitytracker extends IntentService {
+public class activitytracker extends BroadcastReceiver {
 
-    // TODO: Rename actions, choose action names that describe tasks that this
-    // IntentService can perform, e.g. ACTION_FETCH_NEW_ITEMS
-    private static final String ACTION_FOO = "org.philosophism.openmhealth.action.FOO";
-    private static final String ACTION_BAZ = "org.philosophism.openmhealth.action.BAZ";
-
-    // TODO: Rename parameters
-    private static final String EXTRA_PARAM1 = "org.philosophism.openmhealth.extra.PARAM1";
-    private static final String EXTRA_PARAM2 = "org.philosophism.openmhealth.extra.PARAM2";
-
-    public activitytracker() {
-        super("activitytracker");
-    }
-
-    /**
-     * Starts this service to perform action Foo with the given parameters. If
-     * the service is already performing a task this action will be queued.
-     *
-     * @see IntentService
-     */
-    // TODO: Customize helper method
-    public static void startActionFoo(Context context, String param1, String param2) {
+    public static void startAction(Context context, String param1, String param2) {
         Intent intent = new Intent(context, activitytracker.class);
-        intent.setAction(ACTION_FOO);
-        intent.putExtra(EXTRA_PARAM1, param1);
-        intent.putExtra(EXTRA_PARAM2, param2);
         context.startService(intent);
     }
 
-    /**
-     * Starts this service to perform action Baz with the given parameters. If
-     * the service is already performing a task this action will be queued.
-     *
-     * @see IntentService
-     */
-    // TODO: Customize helper method
-    public static void startActionBaz(Context context, String param1, String param2) {
-        Intent intent = new Intent(context, activitytracker.class);
-        intent.setAction(ACTION_BAZ);
-        intent.putExtra(EXTRA_PARAM1, param1);
-        intent.putExtra(EXTRA_PARAM2, param2);
-        context.startService(intent);
+    static PendingIntent createSleepReceiverPendingIntent(Context context) {
+        Intent sleepIntent = new Intent(context, activitytracker.class);
+        return PendingIntent.getBroadcast(context, 0, sleepIntent, PendingIntent.FLAG_CANCEL_CURRENT);
     }
 
     @Override
-    protected void onHandleIntent(Intent intent) {
-        if (intent != null) {
-            final String action = intent.getAction();
-            if (ACTION_FOO.equals(action)) {
-                final String param1 = intent.getStringExtra(EXTRA_PARAM1);
-                final String param2 = intent.getStringExtra(EXTRA_PARAM2);
-                handleActionFoo(param1, param2);
-            } else if (ACTION_BAZ.equals(action)) {
-                final String param1 = intent.getStringExtra(EXTRA_PARAM1);
-                final String param2 = intent.getStringExtra(EXTRA_PARAM2);
-                handleActionBaz(param1, param2);
-            }
+    public void onReceive(Context ctx, Intent intent) {
+        if(SleepSegmentEvent.hasEvents(intent)) {
+            List<SleepSegmentEvent> events = SleepSegmentEvent.extractEvents(intent);
+
+        }else if(SleepClassifyEvent.hasEvents(intent)) {
+            List<SleepClassifyEvent> classifications = SleepClassifyEvent.extractEvents(intent);
+
         }
     }
 
-    /**
-     * Handle action Foo in the provided background thread with the provided
-     * parameters.
-     */
-    private void handleActionFoo(String param1, String param2) {
-        // TODO: Handle action Foo
-        throw new UnsupportedOperationException("Not yet implemented");
-    }
 
-    /**
-     * Handle action Baz in the provided background thread with the provided
-     * parameters.
-     */
-    private void handleActionBaz(String param1, String param2) {
-        // TODO: Handle action Baz
-        throw new UnsupportedOperationException("Not yet implemented");
-    }
 }

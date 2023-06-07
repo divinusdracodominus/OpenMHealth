@@ -5,8 +5,12 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.GestureDetector;
+import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.Window;
 import android.widget.Button;
 
 import androidx.activity.result.ActivityResult;
@@ -30,7 +34,10 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
+import android.widget.Toolbar;
 
+import com.google.android.material.internal.NavigationMenu;
 import com.google.android.material.navigation.NavigationView;
 
 import org.json.JSONObject;
@@ -48,11 +55,27 @@ import com.google.android.material.navigation.NavigationView;
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     final int PERMISSION_REQUEST = 2252;
+    NavigationView navView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        Toolbar bar = findViewById(R.id.my_toolbar);
+        navView = (NavigationView) findViewById(R.id.nav_view);
+
+        Button open_menu = findViewById(R.id.open_menu);
+        open_menu.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(navView.getVisibility() == View.VISIBLE) {
+                    navView.setVisibility(View.GONE);
+                }else{
+                    navView.setVisibility(View.VISIBLE);
+                }
+            }
+        });
 
         SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
@@ -72,7 +95,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 startActivity(i);
             }
         });
-        NavigationView navView = findViewById(R.id.nav_view);
+        navView = findViewById(R.id.nav_view);
         navView.setNavigationItemSelectedListener(this);
 
     }
@@ -85,6 +108,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
+        navView.setVisibility(View.GONE);
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 

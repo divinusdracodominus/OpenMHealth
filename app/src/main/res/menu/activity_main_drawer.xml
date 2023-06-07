@@ -4,6 +4,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:showIn="navigation_view">
 
+    <item
+        android:id="@+id/menu_show"
+        android:title="@string/action_settings"
+        app:showAsAction="always"
+        android:icon="@drawable/common_google_signin_btn_icon_dark"/>
+
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/nav_home"
