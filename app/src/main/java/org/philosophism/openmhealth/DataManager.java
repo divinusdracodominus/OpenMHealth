@@ -88,7 +88,7 @@ public class DataManager extends AppCompatActivity {
     Button submit = null;
 
     SharedPreferences sharedPref;
-    ParticipantData participant;
+    MetaData metadata;
     Uri filename;
     Metric current = null;
 
@@ -98,7 +98,8 @@ public class DataManager extends AppCompatActivity {
                 if (uri != null) {
                     // call this to persist permission across decice reboots
                     getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                    handle_data(uri, current, participant);
+                    metadata.source = current.uri.toString();
+                    handle_data(uri, current, metadata);
 
                 } else {
                     // request denied by user
@@ -134,14 +135,10 @@ public class DataManager extends AppCompatActivity {
     };
     boolean[] accepted = new boolean[metric_list.length];
 
-    private void grab_calendar() {
-
-    }
 
 
 
-
-    private void handle_data(Uri filename, Metric metric, ParticipantData data) {
+    private void handle_data(Uri filename, Metric metric, MetaData data) {
         if(current == null) return;
         Cursor cursor = getContentResolver().query(metric.uri, metric.fields, null, null, null);
         AsyncTask.execute(new Runnable() {
@@ -149,18 +146,14 @@ public class DataManager extends AppCompatActivity {
             public void run() {
                 Looper.prepare();
                 try {
-                    UUID metadata_id = UUID.randomUUID();
-                    JSONObject metadata = new JSONObject();
-                    metadata.put("id", metadata_id);
-                    metadata.put("device_id", data.device_id);
-                    metadata.put("participant_id", data.participant_id);
-                    metadata.put("source", metric.uri.toString());
+                    UUID metadata_id = data.id;
 
                     ArrayList<JSONObject> retrieved = read_data(cursor, metadata_id);
                     JSONArray newData = new JSONArray(retrieved);
-                    String text = newData.toString();
-
-
+                    JSONObject output = new JSONObject();
+                    output.put("metadata", data);
+                    output.put("data", newData);
+                    String text = output.toString();
 
                     Log.i("OpenMHealth", "managed to make it to text point" + text);
 
@@ -273,7 +266,8 @@ public class DataManager extends AppCompatActivity {
         sharedPref = this.getPreferences(Context.MODE_PRIVATE);
         UUID device_id = UUID.fromString(sharedPref.getString("device_id", UUID.randomUUID().toString()));
         UUID participant_id = UUID.randomUUID();
-        participant = new ParticipantData(device_id, participant_id);
+        UUID metadata_id = UUID.randomUUID();
+        metadata = new MetaData(metadata_id, device_id, participant_id);
         LinearLayout checklist = findViewById(R.id.checklist);
 
 
