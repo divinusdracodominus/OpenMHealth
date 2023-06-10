@@ -68,6 +68,11 @@
                         android:id="@+id/drivingbtn">
 
                     </CheckBox>
+                    <CheckBox
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="still"
+                        android:id="@+id/stillbtn"/>
                     <Button
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"

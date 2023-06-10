@@ -43,7 +43,11 @@ public class MenuListener implements NavigationView.OnNavigationItemSelectedList
             Intent i = new Intent(context, DataManager.class);
             context.startActivity(i);
         } else if (id == R.id.nav_events) {
-
+            //Intent openMap = new Intent(context, EventMap.class);
+            //context.startActivity(openMap);
+        }else if(id == R.id.usagestats) {
+            Intent i = new Intent(context, AppStatsCollector.class);
+            context.startActivity(i);
         }
 
         //DrawerLayout drawer = (DrawerLayout) findViewById(R.id.nav_view);

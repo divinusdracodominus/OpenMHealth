@@ -1,25 +1,24 @@
-package org.philosophism.openmhealth;
+package org.philosophism.openmhealth.db;
 
-import android.content.ContentValues;
 import android.content.Context;
-import android.content.res.Resources;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
-public class SleepDBHelper extends SQLiteOpenHelper {
+public class ActivityDBHelper extends SQLiteOpenHelper {
     private final Context context = null;
     private final String TAG = "OpenMHealth";
+    public static final String TABLE_NAME = "activitytracking";
 
     // constructor
-    SleepDBHelper(Context context) {
+    public ActivityDBHelper(Context context) {
         super(context, "sleepdata", null, 3);
         context = context;
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL("CREATE TABLE sleepdata (_id integer primary key, time integer not null, end_time integer, duration integer, confidence integer, light integer, motion integer, is_event boolean);");
+        db.execSQL("CREATE TABLE " + TABLE_NAME + "(_id integer primary key, package_name text not null, time integer, type text);");
 
     }
 
@@ -28,7 +27,7 @@ public class SleepDBHelper extends SQLiteOpenHelper {
 
         Log.w(TAG, "Upgrading database from version " + oldVersion + " to "
                 + newVersion + ", which will destroy all old data");
-        db.execSQL("DROP TABLE IF EXISTS sleepdata");
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
         onCreate(db);
 
     }

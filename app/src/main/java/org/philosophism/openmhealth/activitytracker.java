@@ -28,7 +28,7 @@ public class activitytracker extends BroadcastReceiver {
 
     static PendingIntent createTrackerReceiverPendingIntent(Context context) {
         Intent sleepIntent = new Intent(context, activitytracker.class);
-        return PendingIntent.getBroadcast(context, 0, sleepIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+        return PendingIntent.getBroadcast(context, 0, sleepIntent, PendingIntent.FLAG_CANCEL_CURRENT | PendingIntent.FLAG_MUTABLE);
     }
 
     @Override

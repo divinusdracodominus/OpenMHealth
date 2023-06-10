@@ -101,10 +101,22 @@ public class StartTracker extends AppCompatActivity {
         });
     }
 
-    void subscribeToActivity(Context context, PendingIntent intent) {
+    void subscribeToActivity(Context context, PendingIntent intent, int activity) {
         if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACTIVITY_RECOGNITION) == PackageManager.PERMISSION_GRANTED) {
-            Task task = ActivityRecognition.getClient(context).requestActivityUpdates(DetectedActivity.IN_VEHICLE, intent);
-
+            Log.i("myApp", "tracking activity starting");
+            Task task = ActivityRecognition.getClient(context).requestActivityUpdates(activity, intent);
+            task.addOnSuccessListener(new OnSuccessListener() {
+                @Override
+                public void onSuccess(Object o) {
+                    Log.i(tag, "sucessfully started activity tracker listener");
+                }
+            });
+            task.addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Log.i(tag, "failed to subscribe to activity listener: " + e.getMessage());
+                }
+            });
         }
 
     }
@@ -139,29 +151,36 @@ public class StartTracker extends AppCompatActivity {
             }
         });
 
+        CheckBox sleep = findViewById(R.id.sleepbtn);
+        CheckBox walkbtn = findViewById(R.id.walkbtn);
+        CheckBox runbtn = findViewById(R.id.runbtn);
+        CheckBox drivebtn = findViewById(R.id.drivingbtn);
+        CheckBox stillbtn = findViewById(R.id.stillbtn);
+
         Button submit = findViewById(R.id.submit);
         submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                CheckBox sleep = findViewById(R.id.sleepbtn);
-                CheckBox walkbtn = findViewById(R.id.walkbtn);
-                CheckBox runbtn = findViewById(R.id.runbtn);
-                CheckBox drivebtn = findViewById(R.id.drivingbtn);
-
-                if(sleep.isChecked() && track_sleep == false) {
+                if(sleep.isChecked()) {
                     Log.i("OpenMHealth", "sleep data checked");
                     subscribeToSleepData(getApplicationContext(), sleeptracker.createSleepReceiverPendingIntent(StartTracker.this));
                     editor.putBoolean("sleeptracking", true);
                     track_sleep = true;
-                }else if(sleep.isChecked() && track_sleep) {
+                }
+                if(!sleep.isChecked()) {
                     unSubscribeToSleepData(getApplicationContext(), sleeptracker.createSleepReceiverPendingIntent(StartTracker.this));
                     editor.putBoolean("track_sleep", false);
                     track_sleep = false;
-                }else if(walkbtn.isChecked() && track_walking == false) {
-                    subscribeToActivity(getApplicationContext(), activitytracker.createTrackerReceiverPendingIntent(StartTracker.this));
+                }
+                if(walkbtn.isChecked()) {
+                    subscribeToActivity(getApplicationContext(), activitytracker.createTrackerReceiverPendingIntent(StartTracker.this), DetectedActivity.WALKING);
                     track_walking = true;
-                }else if(walkbtn.isChecked() && track_walking) {
+                }
+                if(!walkbtn.isChecked() && track_walking) {
+
+                }
+                if(stillbtn.isChecked()) {
 
                 }
             }

@@ -24,6 +24,13 @@
         android:theme="@style/Theme.OpenMHealth.NoActionBar"
         tools:targetApi="31">
         <activity
+            android:name=".AppStatsCollector"
+            android:exported="false">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+        <activity
             android:name=".PermissionRequest"
             android:exported="false">
             <meta-data
@@ -35,15 +42,16 @@
             android:name=".activitytracker"
             android:enabled="true"
             android:exported="true" />
-        <receiver android:name=".sleeptracker"
+        <receiver
+            android:name=".sleeptracker"
             android:enabled="true"
-            android:exported="true"/>
+            android:exported="true" />
 
         <provider
             android:name=".SleepProvider"
             android:authorities="openmhealth/sleepdata;openmhealth;org.philosophism.openmhealth.provider"
             android:exported="true"
-            android:readPermission="Mandroid.permission.ACTIVITY_RECOGNITION"></provider>
+            android:readPermission="Mandroid.permission.ACTIVITY_RECOGNITION" />
 
         <activity
             android:name=".StartTracker"

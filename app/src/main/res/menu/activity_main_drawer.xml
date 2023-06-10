@@ -32,5 +32,9 @@
             android:icon="@drawable/icons8_events_64"
             android:title="@string/menu_events_page" />
 
+        <item
+            android:id="@+id/usagestats"
+            android:title="App Usage Stats"/>
+
     </group>
 </menu>
