@@ -5,24 +5,5 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".PermissionRequest">
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:id="@+id/usageView"/>
 
-        <Button
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="accept"
-            android:id="@+id/acceptbtn"/>
-        <Button
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="reject permission"
-            android:id="@+id/rejectbtn"/>
-    </RelativeLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

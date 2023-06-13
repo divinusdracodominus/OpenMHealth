@@ -21,4 +21,13 @@
     <string name="menu_home">Home</string>
     <string name="menu_gallery">Gallery</string>
     <string name="menu_slideshow">Slideshow</string>
+    <string name="menu_results_page">Results Page</string>
+    <string name="menu_metrics_page">Metrics Page</string>
+    <string name="menu_events_page">Events Page</string>
+    <string-array name="file_types">
+        <item>Call Data</item>
+        <item>SMS Data</item>
+    </string-array>
+    <string name="title_activity_event_list">EventList</string>
+
 </resources>
