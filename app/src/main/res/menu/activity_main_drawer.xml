@@ -35,6 +35,5 @@
         <item
             android:id="@+id/usagestats"
             android:title="App Usage Stats"/>
-
     </group>
 </menu>

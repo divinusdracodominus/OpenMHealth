@@ -1,7 +1,6 @@
 package org.philosophism.openmhealth;
 
 import org.philosophism.openmhealth.db.SleepDBHelper;
-
 import android.content.ContentProvider;
 import android.content.ContentUris;
 import android.content.ContentValues;
