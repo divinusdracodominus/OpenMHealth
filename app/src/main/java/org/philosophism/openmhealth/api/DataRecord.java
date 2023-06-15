@@ -9,7 +9,6 @@ public interface DataRecord {
     String getId();
     String getMetaDataId();
     long getDate();
-    Date getFormatedDate();
     //JSONObject anonymize() throws JSONException;
     //JSONObject toJson() throws  JSONException;
 }
