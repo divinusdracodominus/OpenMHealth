@@ -1,5 +1,7 @@
 package org.philosophism.openmhealth;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.PackageManagerCompat;
@@ -14,6 +16,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
@@ -24,109 +28,96 @@ import android.widget.Toast;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.philosophism.openmhealth.api.AppUsageRecord;
 import org.philosophism.openmhealth.db.AppUsageDBHelper;
+import org.philosophism.openmhealth.utils.FileManager;
 
+import java.io.OutputStream;
 import java.util.Calendar;
 import java.util.List;
 
 public class AppStatsCollector extends AppCompatActivity {
 
-    String type_to_string(int event_type) {
-        String kind = new String();
-        switch(event_type) {
-            case UsageEvents.Event.ACTIVITY_PAUSED:
-                kind = "PAUSED";
-            case UsageEvents.Event.ACTIVITY_RESUMED:
-                kind = "RESUMED";
-            case UsageEvents.Event.ACTIVITY_STOPPED:
-                kind = "STOPPED";
-            case UsageEvents.Event.DEVICE_SHUTDOWN:
-                kind = "SHUTDOWN";
-            case UsageEvents.Event.DEVICE_STARTUP:
-                kind = "STARTUP";
-            case UsageEvents.Event.FOREGROUND_SERVICE_START:
-                kind = "FOREGROUND_START";
-            case UsageEvents.Event.FOREGROUND_SERVICE_STOP:
-                kind = "FOREGROUND_STOP";
-            case UsageEvents.Event.KEYGUARD_HIDDEN:
-                kind = "KEYBOARD_HIDEEN";
-            case UsageEvents.Event.KEYGUARD_SHOWN:
-                kind = "KEYBOARD_SHOWN";
-            case UsageEvents.Event.SCREEN_INTERACTIVE:
-                kind = "SCREEN_INTERACTIVE";
-            case UsageEvents.Event.SCREEN_NON_INTERACTIVE:
-                kind = "SCREEN_NON_INTERACTIVE";
-            case UsageEvents.Event.NONE:
-                kind = "NONE";
-            case UsageEvents.Event.USER_INTERACTION:
-                kind = "USER_INTERACTION";
-            case UsageEvents.Event.SHORTCUT_INVOCATION:
-                kind = "SHORTCUT_INTERACTION";
-            case UsageEvents.Event.STANDBY_BUCKET_CHANGED:
-                kind = "STANDBY_BUCKET_CHANGED";
-            default:
-                kind = "UNRECOGNIZED";
-        }
-        return kind;
-    }
+    UsageStatsManager usageManager;
+    SQLiteDatabase database;
+
+    private final ActivityResultLauncher getFileLauncher = registerForActivityResult(
+            new ActivityResultContracts.CreateDocument(),
+            uri -> {
+                if (uri != null) {
+                    // call this to persist permission across decice reboots
+                    getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                    try {
+                        OutputStream file = FileManager.getOutputStream(this, uri);
+                        Log.i("AppUsageStats", "callback entered, about to try grabbing data");
+                        Toast.makeText(AppStatsCollector.this, "in launcher callback", Toast.LENGTH_LONG);
+
+                        Calendar beginCal = Calendar.getInstance();
+                        beginCal.set(Calendar.DATE, 1);
+                        beginCal.set(Calendar.MONTH, 5);
+                        beginCal.set(Calendar.YEAR, 2023);
+
+
+                        Calendar endCal = Calendar.getInstance();
+                        endCal.set(Calendar.DATE, 1);
+                        endCal.set(Calendar.MONTH, 6);
+                        endCal.set(Calendar.YEAR, 2023);
+
+                        final List<UsageStats> queryUsageStats = usageManager
+                                .queryUsageStats(UsageStatsManager.INTERVAL_DAILY,
+                                        beginCal.getTimeInMillis(),
+                                        endCal.getTimeInMillis());
+                        final UsageEvents events = usageManager.queryEvents(beginCal.getTimeInMillis(), endCal.getTimeInMillis());
+
+
+                        AsyncTask.execute(new Runnable() {
+                            @Override
+                            public void run() {
+                                grab_stats(events, file);
+                            }
+                        });
+                    }catch(Exception e) {
+                        Log.e("UsageStats", e.getMessage());
+                    }
+
+                } else {
+                    // request denied by user
+                }
+            }
+    );
 
     JSONObject grab_json(UsageEvents.Event currentEvent) throws JSONException {
-        JSONObject event_data = new JSONObject();
-        String kind = type_to_string(currentEvent.getEventType());
-        String package_name = currentEvent.getPackageName();
-        long time = currentEvent.getTimeStamp();
-        event_data.put("package_name", package_name);
-        event_data.put("kind", kind);
-        event_data.put("time", time);
+        JSONObject event_data = new AppUsageRecord(currentEvent).toJson();
         return event_data;
     }
 
-    UsageStatsManager usageManager;
-    SQLiteDatabase database;
-    void grab_stats() {
-        Calendar beginCal = Calendar.getInstance();
-        beginCal.set(Calendar.DATE, 1);
-        beginCal.set(Calendar.MONTH, 8);
-        beginCal.set(Calendar.YEAR, 2022);
-
-
-
-        Calendar endCal = Calendar.getInstance();
-        endCal.set(Calendar.DATE, 1);
-        endCal.set(Calendar.MONTH, 5);
-        endCal.set(Calendar.YEAR, 2023);
-
-        final List<UsageStats> queryUsageStats = usageManager
-                .queryUsageStats(UsageStatsManager.INTERVAL_DAILY,
-                        beginCal.getTimeInMillis(),
-                        endCal.getTimeInMillis());
-        final UsageEvents events = usageManager.queryEvents(beginCal.getTimeInMillis(), endCal.getTimeInMillis());
+    void grab_stats(UsageEvents events, OutputStream stream) {
 
         UsageEvents.Event currentEvent;
-
+        Log.i("AppUsageStats", "about to enter while loop");
         JSONArray usageEvents = new JSONArray();
         while (events.hasNextEvent()) {
             currentEvent = new UsageEvents.Event();
             events.getNextEvent(currentEvent);
+            Log.d("AppStatusCollector", "inside while...");
+
             try {
-                JSONObject data = grab_json(currentEvent);
-                usageEvents.put(data);
-            }catch(JSONException e) {
+                AppUsageRecord record = new AppUsageRecord(currentEvent);
+                String recordText = record.toJson().toString();
+                Log.i("AppUsageCollector", "text: " + recordText);
+                usageEvents.put(record.toJson());
+            } catch (JSONException e) {
                 Toast.makeText(this, "failed to create JSON object " + e.getMessage(), Toast.LENGTH_LONG);
             }
         }
-        /*for(int i = 0; i < queryUsageStats.size(); i++) {
-            UsageStats stat = queryUsageStats.get(i);
-            Log.i("OpenMHealth", "collected stat: " + stat.getPackageName());
-            ContentValues values = new ContentValues();
-            values.put("package_name", stat.getPackageName());
-            values.put("first_used", stat.getFirstTimeStamp());
-            values.put("last_us ed", stat.getLastTimeStamp());
-            values.put("total_foreground", stat.getTotalTimeInForeground());
-            database.insert(AppUsageDBHelper.TABLE_NAME, null, values);
-        }*/
-    }
 
+        try {
+            FileManager.writeToOutputStream(stream, usageEvents.toString());
+
+        }catch(Exception e) {
+            Log.e("AppStatsCollector", e.getMessage());
+        }
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -145,9 +136,10 @@ public class AppStatsCollector extends AppCompatActivity {
                 int mode = appOps.checkOpNoThrow("android:get_usage_stats",
                         android.os.Process.myUid(), context.getPackageName());
                 boolean granted = mode == AppOpsManager.MODE_ALLOWED;
-
+                Log.i("AppUSageStats", "about to launch activity");
+                Toast.makeText(AppStatsCollector.this, "about to lauch activity", Toast.LENGTH_LONG);
                 if(granted) {
-                    grab_stats();
+                    getFileLauncher.launch(null);
                 }else{
                     startActivity(new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS));
                 }

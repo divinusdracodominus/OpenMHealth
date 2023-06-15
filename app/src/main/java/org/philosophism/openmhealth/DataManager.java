@@ -1,12 +1,11 @@
 package org.philosophism.openmhealth;
 
+import org.philosophism.openmhealth.utils.Metric;
 import static android.database.Cursor.FIELD_TYPE_BLOB;
 import static android.database.Cursor.FIELD_TYPE_FLOAT;
 import static android.database.Cursor.FIELD_TYPE_INTEGER;
 import static android.database.Cursor.FIELD_TYPE_NULL;
 import static android.database.Cursor.FIELD_TYPE_STRING;
-
-import org.philosophism.openmhealth.Metric;
 
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
@@ -63,6 +62,7 @@ import org.json.JSONObject;
 import androidx.appcompat.app.AppCompatActivity;
 
 import org.json.JSONArray;
+import org.philosophism.openmhealth.utils.FileManager;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -119,9 +119,12 @@ public class DataManager extends AppCompatActivity {
             });
 
     Metric[] metric_list = new Metric[]{
-            new Metric("incoming_SMS", Manifest.permission.READ_SMS, "content://sms/inbox", new String[]{"date", "date_sent", "thread_id", "address", "body"}),
+            new Metric("incoming_SMS", Manifest.permission.READ_SMS, "content://sms/inbox",
+                    new String[]{"date", "date_sent", "thread_id", "address", "body"},
+                    new String[]{"date", "thread_id"}),
             new Metric("calllog", Manifest.permission.READ_CALL_LOG, "content://call_log/calls",
-                    new String[]{"number", "date", "duration"}),
+                    new String[]{"number", "date", "duration"},
+                    new String[]{"date", "duration"}),
             new Metric("calendar", Manifest.permission.READ_CALENDAR, "content://com.android.calendar/events",
                     new String[] {
                             "name",
@@ -130,7 +133,9 @@ public class DataManager extends AppCompatActivity {
                             "ownerAccount",
                             "eventLocation",
                             "selfAttendeeStatus"
-                    }),
+                    },
+                    new String[] {"date", "selfAttendeeStatus"}
+                    ),
             new Metric("outgoing_SMS", Manifest.permission.READ_SMS, "content://sms/sent", new String[]{"date", "date_sent", "thread_id", "_id", "address", "body"})
     };
     boolean[] accepted = new boolean[metric_list.length];
@@ -148,7 +153,7 @@ public class DataManager extends AppCompatActivity {
                 try {
                     UUID metadata_id = data.id;
 
-                    ArrayList<JSONObject> retrieved = read_data(cursor, metadata_id);
+                    ArrayList<JSONObject> retrieved = Metric.read_data(cursor, metadata_id);
                     JSONArray newData = new JSONArray(retrieved);
                     JSONObject output = new JSONObject();
                     output.put("metadata", data);
@@ -157,14 +162,7 @@ public class DataManager extends AppCompatActivity {
 
                     Log.i("OpenMHealth", "managed to make it to text point" + text);
 
-                    OutputStream file = getContentResolver().openOutputStream(filename);
-                    Log.i("OpenMHealth", "wrote data to file: " + filename);
-
-                    OutputStreamWriter outputStreamWriter = new OutputStreamWriter(file);
-                    outputStreamWriter.write(text);
-                    outputStreamWriter.flush();
-
-                    outputStreamWriter.close();
+                    FileManager.writeToOutputStream(FileManager.getOutputStream(DataManager.this, filename), text);
                     //output.setText(newData.toString());
                 }catch(IOException e) {
                     Log.e("OpenMHealth", "Error occured: " + e.getMessage());
@@ -190,74 +188,6 @@ public class DataManager extends AppCompatActivity {
     }
 
     private final String[] basedata = new String[]{"date", "date_sent", "thread_id"};
-
-    static int PERMISSION_REQUEST_CODE = 3345;
-
-    public interface DataMetric {
-        DataMetric fromCursor(Cursor cursor, UUID participant_id, UUID device_id);
-        DataMetric fromJson(JSONObject obj);
-        JSONObject toJson();
-    }
-
-    private ArrayList<JSONObject> read_data(Cursor cursor, UUID metadata) throws JSONException {
-        Log.i("OpenMHealth", "permission granted about to read messages");
-
-        ArrayList<JSONObject> messages = new ArrayList();
-        if (cursor.moveToFirst()) { // must check the result to prevent exception
-
-            do {
-                String msgData = "";
-
-                HashMap<String, String> msgMap = new HashMap();
-                JSONObject json =new JSONObject();
-                for(int idx=0;idx<cursor.getColumnCount();idx++)
-                {
-                    String field = cursor.getColumnName(idx);
-                    msgMap.put(field, cursor.getString(idx));
-                    int type = cursor.getType(idx);
-                    switch(type) {
-                        case FIELD_TYPE_STRING:
-                            json.put(cursor.getColumnName(idx), cursor.getString(idx));
-                            break;
-                        case FIELD_TYPE_INTEGER:
-                            json.put(cursor.getColumnName(idx), cursor.getLong(idx));
-                            break;
-                        case FIELD_TYPE_FLOAT:
-                            json.put(cursor.getColumnName(idx), cursor.getFloat(idx));
-                            break;
-                        case FIELD_TYPE_BLOB:
-                            json.put(cursor.getColumnName(idx), cursor.getBlob(idx));
-                            break;
-                        case FIELD_TYPE_NULL:
-
-                            break;
-                    }
-                    String fieldname = cursor.getColumnName(idx);
-                    try {
-                        if (fieldname.equals("number") || fieldname.equals("address")) {
-                            MessageDigest digest = MessageDigest.getInstance("SHA-256");
-                            byte[] hash = digest.digest(cursor.getString(idx).getBytes("UTF-8"));
-                            json.put("recipient_id", Hex.bytesToStringLowercase(hash));
-                        }
-                    }catch(NoSuchAlgorithmException e) {
-                        Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG);
-                    }catch(UnsupportedEncodingException e) {
-                        Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG);
-                    }
-                }
-                json.put("metadata", metadata.toString());
-                json.put("id", UUID.randomUUID().toString());
-                messages.add(json);
-                // use msgData
-
-            } while (cursor.moveToNext());
-
-
-        } else {
-            Log.i("OpenMHealth", "no sms to be found");
-        }
-        return messages;
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -298,44 +228,6 @@ public class DataManager extends AppCompatActivity {
         });
 
         checklist.addView(submit);
-
-        /*metrics.setAdapter(new ArrayAdapter<String>(this,
-                android.R.layout.simple_list_item_multiple_choice, metric_names));
-        metrics.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
-
-        metrics.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-
-            public void onItemClick(AdapterView arg0, View item, int position, long id)
-            {
-                ListAdapter adapter = metrics.getAdapter();
-                if(adapter.isEnabled(position)) {
-                    Log.i("OpenMHealth", "check box enabled at position " + position);
-                    accepted[position] = metric_list[position];
-
-                }else{
-                    Log.i("OpenMHealth", "disabled at position " + position);
-                    accepted[position] = null;
-                }
-            }
-        });*/
-        //setListViewHeightBasedOnChildren(metrics);
-
-    }
-
-    public static void setListViewHeightBasedOnChildren(ListView myListView) {
-        ListAdapter adapter = myListView.getAdapter();
-
-
-            int totalHeight = 0;
-            for (int i = 0; i < adapter.getCount(); i++) {
-                View item= adapter.getView(i, null, myListView);
-                item.measure(0, 0);
-                totalHeight += item.getMeasuredHeight();
-            }
-
-            ViewGroup.LayoutParams params = myListView.getLayoutParams();
-            params.height = totalHeight + (myListView.getDividerHeight() * (adapter.getCount() - 1));
-            myListView.setLayoutParams(params);
 
     }
 

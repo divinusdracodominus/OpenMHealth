@@ -1,5 +1,10 @@
 package org.philosophism.openmhealth;
 
+import org.json.JSONException;
+import org.philosophism.openmhealth.api.Event;
+import org.philosophism.openmhealth.utils.EventsAdapter;
+import org.philosophism.openmhealth.utils.MenuListener;
+import org.philosophism.openmhealth.utils.Metric;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
@@ -17,9 +22,12 @@ import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
 import android.app.Activity;
@@ -56,6 +64,24 @@ public class MainActivity extends AppCompatActivity {
 
     final int PERMISSION_REQUEST = 2252;
     NavigationView navView;
+    Event[] sampleEvents = new Event[]{
+            new Event("event 1", "description 1"),
+            new Event("event 1", "description 1"),
+            new Event("event 1", "description 1"),
+            new Event("event 1", "description 1"),
+    };
+
+    Metric calendar = new org.philosophism.openmhealth.utils.Metric("calendar", Manifest.permission.READ_CALENDAR, "content://com.android.calendar/events",
+            new String[] {
+                    "name",
+                    "title",
+                    "description",
+                    "ownerAccount",
+                    "eventLocation",
+                    "selfAttendeeStatus"
+            },
+            new String[] {"date", "selfAttendeeStatus"}
+    );
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,6 +90,46 @@ public class MainActivity extends AppCompatActivity {
 
         Toolbar bar = findViewById(R.id.my_toolbar);
         navView = (NavigationView) findViewById(R.id.nav_view);
+
+        Event[] events = null;
+        if(ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CALENDAR) == PackageManager.PERMISSION_GRANTED) {
+            Cursor cursor = getContentResolver().query(calendar.uri, calendar.fields, null, null, null);
+            try {
+                ArrayList<JSONObject> eventdata = Metric.read_data(cursor, UUID.randomUUID());
+
+                ArrayList<Event> tempList = new ArrayList<>();
+                for(int i = 0; i < eventdata.size(); i++) {
+                    Event newEvent = Event.fromJSON(eventdata.get(i));
+                    if(newEvent != null) {
+                        tempList.add(newEvent);
+                    }
+                }
+                Event[] newEvents = new Event[tempList.size()];
+                for(int i = 0; i < tempList.size(); i++) {
+                    newEvents[i] = tempList.get(i);
+                }
+                events = newEvents;
+
+            }catch (JSONException e) {
+                Log.e("MyTag", "error: " + e.getMessage());
+                e.printStackTrace();
+                events = sampleEvents;
+            }
+        }else{
+            events = sampleEvents;
+        }
+
+        EventsAdapter adapter = new EventsAdapter(events);
+
+        adapter.setOnItemSelectedListener(new EventsAdapter.ItemSelectedListener() {
+            @Override
+            public void onSelect(View v, int index) {
+                Log.i("MyDataManager", "item clicked at index: " + index);
+            }
+        });
+        RecyclerView eventsview = findViewById(R.id.eventlist);
+        eventsview.setLayoutManager(new LinearLayoutManager(MainActivity.this));
+        eventsview.setAdapter(adapter);
 
         Button open_menu = findViewById(R.id.open_menu);
         open_menu.setOnClickListener(new View.OnClickListener() {
@@ -85,7 +151,6 @@ public class MainActivity extends AppCompatActivity {
             editor.putString("device_id", UUID.randomUUID().toString());
         }
 
-        navView = findViewById(R.id.nav_view);
         navView.setNavigationItemSelectedListener(new MenuListener(this, navView));
 
     }

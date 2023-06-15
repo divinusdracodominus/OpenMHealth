@@ -1,4 +1,4 @@
-package org.philosophism.openmhealth;
+package org.philosophism.openmhealth.utils;
 
 import android.content.Context;
 import android.content.Intent;
@@ -7,11 +7,18 @@ import android.view.View;
 
 import com.google.android.material.navigation.NavigationView;
 
+import org.philosophism.openmhealth.AppStatsCollector;
+import org.philosophism.openmhealth.DataManager;
+import org.philosophism.openmhealth.MainActivity;
+import org.philosophism.openmhealth.R;
+import org.philosophism.openmhealth.ResultsManager;
+import org.philosophism.openmhealth.StartTracker;
+
 public class MenuListener implements NavigationView.OnNavigationItemSelectedListener {
     NavigationView navView;
     Context context;
 
-    MenuListener(Context context, NavigationView navView) {
+    public MenuListener(Context context, NavigationView navView) {
         this.context = context;
         this.navView = navView;
     }

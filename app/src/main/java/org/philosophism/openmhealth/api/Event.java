@@ -28,12 +28,17 @@ public class Event {
         this.image_url = null;
         this.image_description = null;
     }
-    public Event(JSONObject obj) throws JSONException {
-        this.id = UUID.fromString(obj.getString("id"));
-        this.title = obj.getString("title");
-        this.description = obj.getString("description");
-        this.image_url = Uri.parse(obj.getString("image_url"));
-        this.image_description = obj.getString("image_description");
+    public static Event fromJSON(JSONObject obj) throws JSONException {
+        //this.id = UUID.fromString(obj.getString("id"));
+        Event retval = null;
+        if(obj.has("title") && obj.has("description")) {
+            String title = obj.getString("title");
+            String description = obj.getString("description");
+            return new Event(title, description);
+        }
+        //this.image_url = Uri.parse(obj.getString("image_url"));
+        //this.image_description = obj.getString("image_description");
+        return null;
     }
 
     public JSONObject toJSON() throws JSONException {
