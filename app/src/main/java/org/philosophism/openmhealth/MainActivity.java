@@ -101,6 +101,8 @@ public class MainActivity extends AppCompatActivity {
                 for(int i = 0; i < eventdata.size(); i++) {
                     Event newEvent = Event.fromJSON(eventdata.get(i));
                     if(newEvent != null) {
+                        newEvent.image_url = "https://www.pdx.edu/sites/g/files/znldhr781/files/styles/large_hero_media_extra_large_1440_x_587/public/2022-10/20220711_PSU_PDX_Skyline_033.jpg";
+                        newEvent.image_description = "View of Portland Oregon Downtown";
                         tempList.add(newEvent);
                     }
                 }
@@ -119,7 +121,7 @@ public class MainActivity extends AppCompatActivity {
             events = sampleEvents;
         }
 
-        EventsAdapter adapter = new EventsAdapter(events);
+        EventsAdapter adapter = new EventsAdapter(MainActivity.this, events);
 
         adapter.setOnItemSelectedListener(new EventsAdapter.ItemSelectedListener() {
             @Override

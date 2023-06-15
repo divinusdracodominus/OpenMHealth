@@ -2,11 +2,14 @@ package org.philosophism.openmhealth.utils;
 
 import org.philosophism.openmhealth.api.Event;
 
+import android.content.Context;
 import android.net.Uri;
+import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.WebView;
 import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -14,6 +17,8 @@ import android.widget.TextView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import org.philosophism.openmhealth.R;
+
+import java.nio.charset.StandardCharsets;
 
 public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.ViewHolder> {
 
@@ -23,6 +28,7 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.ViewHolder
 
         private Event[] localDataSet;
         ItemSelectedListener onSelect = null;
+        Context context;
 
         /**
          * Provide a reference to the type of views that you are using
@@ -30,7 +36,7 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.ViewHolder
          */
         public static class ViewHolder extends RecyclerView.ViewHolder {
             private final TextView titleView;
-            private final TextView descriptionView;
+            private final WebView descriptionView;
             private final ImageView imageView;
             private int idx;
             private ItemSelectedListener onSelect;
@@ -45,14 +51,17 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.ViewHolder
                 imageView = view.findViewById(R.id.image);
             }
 
-            public void setData(Event event, ItemSelectedListener listener, int index) {
+            public void setData(Context context, Event event, ItemSelectedListener listener, int index) {
                 this.idx = index;
                 this.onSelect = listener;
                 this.titleView.setText(event.title);
-                this.descriptionView.setText(event.description);
+
+                String encoded = Base64.encodeToString(event.description.getBytes(), Base64.NO_PADDING);
+                this.descriptionView.loadData(encoded, "text/html", "base64");
+
                 if(event.image_url != null) {
-                    this.imageView.setImageURI(event.image_url);
                     this.imageView.setVisibility(View.VISIBLE);
+                    new ImageLoader(context, event.image_url, this.imageView).execute();
                 }
                 if(event.image_description != null) {
                     this.imageView.setContentDescription(event.description);
@@ -82,7 +91,8 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.ViewHolder
             onSelect = llistener;
         }
 
-        public EventsAdapter(Event[] dataSet) {
+        public EventsAdapter(Context ctx, Event[] dataSet) {
+            this.context = ctx;
             this.localDataSet = dataSet;
         }
 
@@ -106,7 +116,7 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.ViewHolder
 
             // Get element from your dataset at this position and replace the
             // contents of the view with that element
-            viewHolder.setData(localDataSet[position], this.onSelect, position);
+            viewHolder.setData(context, localDataSet[position], this.onSelect, position);
 
         }
 

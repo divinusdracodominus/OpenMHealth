@@ -125,17 +125,30 @@ public class DataManager extends AppCompatActivity {
             new Metric("calllog", Manifest.permission.READ_CALL_LOG, "content://call_log/calls",
                     new String[]{"number", "date", "duration"},
                     new String[]{"date", "duration"}),
-            new Metric("calendar", Manifest.permission.READ_CALENDAR, "content://com.android.calendar/events",
+            new Metric("calendar", Manifest.permission.READ_CALENDAR,  CalendarContract.Events.CONTENT_URI,
                     new String[] {
-                            "name",
-                            "title",
-                            "description",
-                            "ownerAccount",
-                            "eventLocation",
-                            "selfAttendeeStatus"
+                            CalendarContract.Events._ID,
+                            CalendarContract.Events.ACCOUNT_NAME,
+                            CalendarContract.Events.TITLE,
+                            CalendarContract.Events.DESCRIPTION,
+                            CalendarContract.Events.EVENT_LOCATION,
+                            CalendarContract.Events.DTSTART,
+                            CalendarContract.Events.DTEND,
+                            CalendarContract.Events.EVENT_COLOR,
+                            CalendarContract.Events.DISPLAY_COLOR,
+                            CalendarContract.Events.RDATE,
+                            CalendarContract.Events.DURATION,
+                            CalendarContract.Events.EVENT_COLOR,
+                            CalendarContract.Events.ORGANIZER,
+                            CalendarContract.Events.OWNER_ACCOUNT
                     },
                     new String[] {"date", "selfAttendeeStatus"}
                     ),
+            /*new Metric("event_instances", Manifest.permission.READ_CALENDAR, CalendarContract.Instances.CONTENT_URI, new String[] {
+                    CalendarContract.Instances.EVENT_ID,
+                    CalendarContract.Instances.BEGIN,
+                    CalendarContract.Instances.END
+            }, new String[]{}),*/
             new Metric("outgoing_SMS", Manifest.permission.READ_SMS, "content://sms/sent", new String[]{"date", "date_sent", "thread_id", "_id", "address", "body"})
     };
     boolean[] accepted = new boolean[metric_list.length];

@@ -3,6 +3,8 @@ package org.philosophism.openmhealth.utils;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.util.Log;
 
@@ -11,6 +13,7 @@ import androidx.activity.result.ActivityResultRegistry;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -45,5 +48,17 @@ public class FileManager {
             stringBuilder.append(new String(buffer, 0, bytesRead));
         }
         return stringBuilder.toString();
+    }
+    public static Bitmap readBitmapFromInputStream(InputStream inputStream) {
+        Bitmap retval = BitmapFactory.decodeStream(inputStream);
+        return retval;
+    }
+    public static void writeBitmapToOutputStream(OutputStream outputStream, Bitmap bitmap) throws IOException{
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG, 0 /*ignored for PNG*/, bos);
+        byte[] bitmapdata = bos.toByteArray();
+        outputStream.write(bitmapdata);
+        outputStream.flush();
+        outputStream.close();
     }
 }
