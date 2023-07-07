@@ -6,11 +6,13 @@ import static android.database.Cursor.FIELD_TYPE_INTEGER;
 import static android.database.Cursor.FIELD_TYPE_NULL;
 import static android.database.Cursor.FIELD_TYPE_STRING;
 
+import android.Manifest;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Looper;
+import android.provider.CalendarContract;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -100,6 +102,10 @@ public class Metric {
         Log.i("OpenMHealth", "permission granted about to read messages");
 
         ArrayList<JSONObject> messages = new ArrayList();
+        if(cursor == null) {
+            Log.w("Metric", "cursor is null in metric.read_data");
+            return messages;
+        }
         if (cursor.moveToFirst()) { // must check the result to prevent exception
 
             do {
@@ -132,9 +138,7 @@ public class Metric {
                     String fieldname = cursor.getColumnName(idx);
                     try {
                         if (fieldname.equals("number") || fieldname.equals("address")) {
-                            MessageDigest digest = MessageDigest.getInstance("SHA-256");
-                            byte[] hash = digest.digest(cursor.getString(idx).getBytes("UTF-8"));
-                            json.put("recipient_id", Hex.bytesToStringLowercase(hash));
+                            json.put("recipient_id", Utils.hashUUID(cursor.getString(idx).toString()));
                         }
                     }catch(NoSuchAlgorithmException e) {
                         Log.i("MyDataManager", "error: " + e.getMessage());
@@ -157,4 +161,31 @@ public class Metric {
         }
         return messages;
     }
+
+    public ArrayList<JSONObject> fetch(Context context, UUID metadata_id) throws JSONException {
+        Cursor cursor = context.getContentResolver().query(this.uri, this.fields, null, null, null);
+        return read_data(cursor, metadata_id);
+    }
+
+    public static final Metric calendars = new Metric("list calendars", Manifest.permission.READ_CALENDAR, CalendarContract.Calendars.CONTENT_URI, new String[] {
+            CalendarContract.Calendars._ID,
+            CalendarContract.Calendars.NAME,
+            CalendarContract.Calendars.CALENDAR_COLOR,
+            CalendarContract.Calendars.ACCOUNT_NAME,
+            CalendarContract.Calendars.ACCOUNT_TYPE,
+            CalendarContract.Calendars.CALENDAR_ACCESS_LEVEL,
+            CalendarContract.Calendars.OWNER_ACCOUNT
+    });
+
+    public static final Metric events = new org.philosophism.openmhealth.utils.Metric("calendar", Manifest.permission.READ_CALENDAR, "content://com.android.calendar/events",
+            new String[] {
+                    CalendarContract.Events.ACCOUNT_NAME,
+                    CalendarContract.Events.TITLE,
+                    CalendarContract.Events.DESCRIPTION,
+                    CalendarContract.Events.OWNER_ACCOUNT,
+                    CalendarContract.Events.EVENT_LOCATION,
+                    CalendarContract.Events.SELF_ATTENDEE_STATUS,
+            },
+            new String[] {"date", "selfAttendeeStatus"}
+    );
 }

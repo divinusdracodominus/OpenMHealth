@@ -53,20 +53,16 @@ public class AppStatsCollector extends AppCompatActivity {
                         Toast.makeText(AppStatsCollector.this, "in launcher callback", Toast.LENGTH_LONG);
 
                         Calendar beginCal = Calendar.getInstance();
-                        beginCal.set(Calendar.DATE, 1);
+                        beginCal.set(Calendar.DAY_OF_MONTH, 1);
                         beginCal.set(Calendar.MONTH, 5);
                         beginCal.set(Calendar.YEAR, 2023);
 
 
                         Calendar endCal = Calendar.getInstance();
-                        endCal.set(Calendar.DATE, 1);
+                        endCal.set(Calendar.DAY_OF_MONTH, 1);
                         endCal.set(Calendar.MONTH, 6);
                         endCal.set(Calendar.YEAR, 2023);
 
-                        final List<UsageStats> queryUsageStats = usageManager
-                                .queryUsageStats(UsageStatsManager.INTERVAL_DAILY,
-                                        beginCal.getTimeInMillis(),
-                                        endCal.getTimeInMillis());
                         final UsageEvents events = usageManager.queryEvents(beginCal.getTimeInMillis(), endCal.getTimeInMillis());
 
 

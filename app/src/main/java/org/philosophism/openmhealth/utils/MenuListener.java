@@ -12,6 +12,7 @@ import org.philosophism.openmhealth.DataManager;
 import org.philosophism.openmhealth.MainActivity;
 import org.philosophism.openmhealth.R;
 import org.philosophism.openmhealth.ResultsManager;
+import org.philosophism.openmhealth.Settings;
 import org.philosophism.openmhealth.StartTracker;
 
 public class MenuListener implements NavigationView.OnNavigationItemSelectedListener {
@@ -55,6 +56,9 @@ public class MenuListener implements NavigationView.OnNavigationItemSelectedList
             //context.startActivity(openMap);
         }else if(id == R.id.usagestats) {
             Intent i = new Intent(context, AppStatsCollector.class);
+            context.startActivity(i);
+        }else if(id == R.id.nav_settings) {
+            Intent i = new Intent(context, Settings.class);
             context.startActivity(i);
         }
 

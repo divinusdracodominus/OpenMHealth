@@ -5,6 +5,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import org.philosophism.openmhealth.api.contracts.ActivityContract;
+
 public class ActivityDBHelper extends SQLiteOpenHelper {
     private final Context context = null;
     private final String TAG = "OpenMHealth";
@@ -18,7 +20,13 @@ public class ActivityDBHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL("CREATE TABLE " + TABLE_NAME + "(_id integer primary key, package_name text not null, time integer, type text);");
+        db.execSQL("CREATE TABLE " + TABLE_NAME + "("
+                + ActivityContract._ID + " integer primary key, "
+                + ActivityContract.ID + " text unique not null, "
+                + ActivityContract.DATE + " integer, "
+                + ActivityContract.TRANSITION_TYPE + " text, "
+                + ActivityContract.ACTIVITY + " text, "
+                + ActivityContract.PLATFORM_ACTIVITY_TYPE + " integer);");
 
     }
 

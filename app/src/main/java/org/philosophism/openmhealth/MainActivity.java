@@ -9,6 +9,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.provider.CalendarContract;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.Menu;
@@ -71,17 +72,18 @@ public class MainActivity extends AppCompatActivity {
             new Event("event 1", "description 1"),
     };
 
-    Metric calendar = new org.philosophism.openmhealth.utils.Metric("calendar", Manifest.permission.READ_CALENDAR, "content://com.android.calendar/events",
+    Metric calendar = Metric.events;
+    /*Metric calendar = new org.philosophism.openmhealth.utils.Metric("calendar", Manifest.permission.READ_CALENDAR, "content://com.android.calendar/events",
             new String[] {
-                    "name",
-                    "title",
-                    "description",
+                    CalendarContract.Events.ACCOUNT_NAME,
+                    CalendarContract.Events.TITLE,
+                    CalendarContract.Events.DESCRIPTION,
                     "ownerAccount",
                     "eventLocation",
                     "selfAttendeeStatus"
             },
             new String[] {"date", "selfAttendeeStatus"}
-    );
+    );*/
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

@@ -47,8 +47,6 @@ public class NetManager {
         return FileManager.readFromInputStream(connect.getInputStream());
     }
 
-
-
     public static LinkProperties getLinkProperties(Context context) {
         ConnectivityManager connectivityManager = context.getSystemService(ConnectivityManager.class);
         Network currentNetwork = connectivityManager.getActiveNetwork();

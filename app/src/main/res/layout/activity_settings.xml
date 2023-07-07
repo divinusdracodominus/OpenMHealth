@@ -4,11 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
-
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+    tools:context=".Settings">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -43,12 +39,41 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:orientation="vertical"
+                    android:padding="@dimen/app_padding"
                     android:id="@+id/activities">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textStyle="bold"
+                        android:textSize="@dimen/title_font_size"
+                        android:text="metrics"/>
+
+                    
+                    <Button
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/export_metrics"
+                        android:text="export metrics"/>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textStyle="bold"
+                        android:textSize="@dimen/title_font_size"
+                        android:text="calendars"/>
 
                     <androidx.recyclerview.widget.RecyclerView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:id="@+id/eventlist"/>
+                        android:id="@+id/calendarsview"/>
+                    <Button
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="import configuration"
+                        android:id="@+id/importconfigs"/>
+
+
 
                 </LinearLayout>
             </ScrollView>
@@ -61,7 +86,5 @@
                 android:visibility="gone"/>
         </androidx.drawerlayout.widget.DrawerLayout>
     </LinearLayout>
-    </FrameLayout>
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>

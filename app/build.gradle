@@ -6,6 +6,8 @@ plugins {
 android {
     namespace 'org.philosophism.openmhealth'
     compileSdk 32
+	
+	ndkVersion rootProject.ext.ndkVersion
 
     defaultConfig {
         applicationId "org.philosophism.openmhealth"
@@ -32,6 +34,14 @@ android {
     }
 }
 
+apply plugin: 'org.mozilla.rust-android-gradle.rust-android'
+
+cargo {
+    module  = "./deps/resvg/crates/c-api/"       // Or whatever directory contains your Cargo.toml
+    libname = "resvg"          // Or whatever matches Cargo.toml's [package] name.
+    targets = ["arm", "x86"]  // See bellow for a longer list of options
+}
+
 dependencies {
 
     implementation 'androidx.appcompat:appcompat:1.4.1'
@@ -47,4 +57,5 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
     implementation 'com.google.android.gms:play-services-location:21.0.1'
+    implementation 'com.caverock:androidsvg:1.2.1'
 }

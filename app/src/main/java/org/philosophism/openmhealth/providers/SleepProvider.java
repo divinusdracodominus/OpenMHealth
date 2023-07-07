@@ -1,5 +1,6 @@
-package org.philosophism.openmhealth;
+package org.philosophism.openmhealth.providers;
 
+import org.philosophism.openmhealth.api.contracts.SleepContract;
 import org.philosophism.openmhealth.db.SleepDBHelper;
 import android.content.ContentProvider;
 import android.content.ContentUris;
@@ -54,12 +55,12 @@ public class SleepProvider extends ContentProvider {
                 // If the URI isn't recognized, do some error handling here
         }
         // Call the code to actually do the query
-        return db.query("sleepdata", projection, selection, selectionArgs, null, null, sortOrder);
+        return db.query(SleepContract.TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);
     }
 
     @Override
     public Uri insert(Uri uri, ContentValues values) throws SQLException {
-        long id = db.insert("sleepdata", null, values);
+        long id = db.insert(SleepContract.TABLE_NAME, null, values);
         return ContentUris.withAppendedId(uri, id);
     }
 
@@ -71,11 +72,11 @@ public class SleepProvider extends ContentProvider {
 
     @Override
     public int delete (Uri uri, String selection, String[] selectionArgs) {
-        return db.delete("sleepdata", selection, selectionArgs);
+        return db.delete(SleepContract.TABLE_NAME, selection, selectionArgs);
     }
 
     public String getType(Uri uri) {
-        return "geopackage.sqlite3";
+        return "org.philosophism.openmhealth.providers.sleepdata";
     }
 
 }

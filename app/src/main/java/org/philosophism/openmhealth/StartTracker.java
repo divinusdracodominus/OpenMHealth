@@ -48,6 +48,17 @@ public class StartTracker extends AppCompatActivity {
     boolean track_travel;
     boolean track_excercise;
 
+    int[] activity_types = new int[] {
+        DetectedActivity.IN_VEHICLE,
+        DetectedActivity.ON_BICYCLE,
+        DetectedActivity.ON_FOOT,
+        DetectedActivity.STILL,
+        DetectedActivity.UNKNOWN,
+        DetectedActivity.TILTING,
+        DetectedActivity.WALKING,
+        DetectedActivity.RUNNING
+    };
+
     private final String tag = "MHealth StartTracker";
 
     private ActivityResultLauncher<String> requestPermissionLauncher =
@@ -109,7 +120,7 @@ public class StartTracker extends AppCompatActivity {
             task.addOnSuccessListener(new OnSuccessListener() {
                 @Override
                 public void onSuccess(Object o) {
-                    Log.i(tag, "sucessfully started activity tracker listener");
+                    Log.i(tag, "sucessfully started activity tracker listener for activity: " + activitytracker.getActivityType(activity));
                 }
             });
             task.addOnFailureListener(new OnFailureListener() {
@@ -152,37 +163,12 @@ public class StartTracker extends AppCompatActivity {
             }
         });
 
-        CheckBox sleep = findViewById(R.id.sleepbtn);
-        CheckBox walkbtn = findViewById(R.id.walkbtn);
-        CheckBox runbtn = findViewById(R.id.runbtn);
-        CheckBox drivebtn = findViewById(R.id.drivingbtn);
-        CheckBox stillbtn = findViewById(R.id.stillbtn);
-
         Button submit = findViewById(R.id.submit);
         submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                if(sleep.isChecked()) {
-                    Log.i("OpenMHealth", "sleep data checked");
-                    subscribeToSleepData(getApplicationContext(), sleeptracker.createSleepReceiverPendingIntent(StartTracker.this));
-                    editor.putBoolean("sleeptracking", true);
-                    track_sleep = true;
-                }
-                if(!sleep.isChecked()) {
-                    unSubscribeToSleepData(getApplicationContext(), sleeptracker.createSleepReceiverPendingIntent(StartTracker.this));
-                    editor.putBoolean("track_sleep", false);
-                    track_sleep = false;
-                }
-                if(walkbtn.isChecked()) {
-                    subscribeToActivity(getApplicationContext(), activitytracker.createTrackerReceiverPendingIntent(StartTracker.this), DetectedActivity.WALKING);
-                    track_walking = true;
-                }
-                if(!walkbtn.isChecked() && track_walking) {
-
-                }
-                if(stillbtn.isChecked()) {
-
+                for(int i = 0; i < activity_types.length; i++) {
+                    subscribeToActivity(StartTracker.this, activitytracker.createTrackerReceiverPendingIntent(StartTracker.this), activity_types[i]);
                 }
             }
         });

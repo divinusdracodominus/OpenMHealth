@@ -7,6 +7,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import org.philosophism.openmhealth.api.contracts.SleepContract;
+
 public class SleepDBHelper extends SQLiteOpenHelper {
     private final Context context = null;
     private final String TAG = "OpenMHealth";
@@ -19,7 +21,16 @@ public class SleepDBHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL("CREATE TABLE sleepdata (_id integer primary key, time integer not null, end_time integer, duration integer, confidence integer, light integer, motion integer, is_event boolean);");
+        db.execSQL("CREATE TABLE " + SleepContract.TABLE_NAME + " ("
+                + SleepContract._ID + " integer primary key, "
+                + SleepContract.ID + " text unique, "
+                + SleepContract.DATE + " integer not null, "
+                + SleepContract.END_DATE + " integer, "
+                + SleepContract.DURATION + " integer, "
+                + SleepContract.CONFIDENCE + " integer, "
+                + SleepContract.BRIGHTNESS + " integer, "
+                + SleepContract.MOTION + " integer, "
+                + SleepContract.IS_EVENT + " boolean);");
 
     }
 

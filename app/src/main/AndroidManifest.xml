@@ -8,7 +8,6 @@
     <uses-permission android:name="android.permission.WRITE_CALENDAR" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.PACKAGE_USAGE_STATS" />
-
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -24,6 +23,13 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.OpenMHealth.NoActionBar"
         tools:targetApi="31">
+        <activity
+            android:name=".Settings"
+            android:exported="false">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
         <activity
             android:name=".AppStatsCollector"
             android:exported="false">
@@ -49,8 +55,8 @@
             android:exported="true" />
 
         <provider
-            android:name=".SleepProvider"
-            android:authorities="openmhealth/sleepdata;openmhealth;org.philosophism.openmhealth.provider"
+            android:name=".providers.SleepProvider"
+            android:authorities="org.philosophism.openmhealth.providers.sleepdata"
             android:exported="true"
             android:readPermission="Mandroid.permission.ACTIVITY_RECOGNITION" />
 

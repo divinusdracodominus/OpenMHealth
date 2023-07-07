@@ -1,5 +1,6 @@
 package org.philosophism.openmhealth;
 
+import org.philosophism.openmhealth.api.contracts.SleepContract;
 import org.philosophism.openmhealth.utils.Metric;
 import static android.database.Cursor.FIELD_TYPE_BLOB;
 import static android.database.Cursor.FIELD_TYPE_FLOAT;
@@ -125,6 +126,16 @@ public class DataManager extends AppCompatActivity {
             new Metric("calllog", Manifest.permission.READ_CALL_LOG, "content://call_log/calls",
                     new String[]{"number", "date", "duration"},
                     new String[]{"date", "duration"}),
+            new Metric("sleep data", Manifest.permission.ACTIVITY_RECOGNITION, SleepContract.CONTENT_URI, new String[] {
+                    SleepContract._ID,
+                    SleepContract.DATE,
+                    SleepContract.END_DATE,
+                    SleepContract.DURATION,
+                    SleepContract.CONFIDENCE,
+                    SleepContract.BRIGHTNESS,
+                    SleepContract.MOTION,
+                    SleepContract.IS_EVENT
+            }),
             new Metric("calendar", Manifest.permission.READ_CALENDAR,  CalendarContract.Events.CONTENT_URI,
                     new String[] {
                             CalendarContract.Events._ID,
@@ -142,7 +153,7 @@ public class DataManager extends AppCompatActivity {
                             CalendarContract.Events.ORGANIZER,
                             CalendarContract.Events.OWNER_ACCOUNT
                     },
-                    new String[] {"date", "selfAttendeeStatus"}
+                    new String[] {CalendarContract.Events.RDATE, "selfAttendeeStatus"}
                     ),
             /*new Metric("event_instances", Manifest.permission.READ_CALENDAR, CalendarContract.Instances.CONTENT_URI, new String[] {
                     CalendarContract.Instances.EVENT_ID,

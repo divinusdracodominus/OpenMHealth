@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.util.Log;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -60,5 +61,14 @@ public class FileManager {
         outputStream.write(bitmapdata);
         outputStream.flush();
         outputStream.close();
+    }
+
+    public static class DataUploader extends AsyncTask<Void, Void, String> {
+        @Override
+        protected String doInBackground(Void... args) {
+            
+            return new String();
+        }
+
     }
 }
