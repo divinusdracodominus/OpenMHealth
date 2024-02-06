@@ -36,25 +36,17 @@ public class MenuListener implements NavigationView.OnNavigationItemSelectedList
         } else if (id == R.id.nav_home) {
             Intent home = new Intent(context, MainActivity.class);
             context.startActivity(home);
-        } else if (id == R.id.nav_results) {
-
-
-            //Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-            //intent.setType("*/*"); // Set the MIME type to allow all file types
-            //intent.addCategory(Intent.CATEGORY_OPENABLE);
-
-            // Start the activity with the created intent
-            //context.startActivity(Intent.createChooser(intent, "Select File"));
+        } /*else if (id == R.id.nav_results) {
             Intent a = new Intent(context, ResultsManager.class);
             context.startActivity(a);
 
-        } else if (id == R.id.nav_metrics) {
+        } */else if (id == R.id.nav_metrics) {
             Intent i = new Intent(context, DataManager.class);
             context.startActivity(i);
-        } else if (id == R.id.nav_events) {
+        } /*else if (id == R.id.nav_events) {
             //Intent openMap = new Intent(context, EventMap.class);
             //context.startActivity(openMap);
-        }else if(id == R.id.usagestats) {
+        } */ else if(id == R.id.usagestats) {
             Intent i = new Intent(context, AppStatsCollector.class);
             context.startActivity(i);
         }else if(id == R.id.nav_settings) {

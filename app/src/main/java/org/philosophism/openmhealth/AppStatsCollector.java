@@ -2,6 +2,7 @@ package org.philosophism.openmhealth;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.PackageManagerCompat;
@@ -23,7 +24,10 @@ import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CalendarView;
 import android.widget.Toast;
+
+import com.google.android.material.navigation.NavigationView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -31,6 +35,7 @@ import org.json.JSONObject;
 import org.philosophism.openmhealth.api.AppUsageRecord;
 import org.philosophism.openmhealth.db.AppUsageDBHelper;
 import org.philosophism.openmhealth.utils.FileManager;
+import org.philosophism.openmhealth.utils.MenuListener;
 
 import java.io.OutputStream;
 import java.util.Calendar;
@@ -40,6 +45,11 @@ public class AppStatsCollector extends AppCompatActivity {
 
     UsageStatsManager usageManager;
     SQLiteDatabase database;
+    CalendarView beginView;
+    CalendarView endView;
+    Calendar begin = null;
+    Calendar end = null;
+    NavigationView navView;
 
     private final ActivityResultLauncher getFileLauncher = registerForActivityResult(
             new ActivityResultContracts.CreateDocument(),
@@ -54,24 +64,33 @@ public class AppStatsCollector extends AppCompatActivity {
 
                         Calendar beginCal = Calendar.getInstance();
                         beginCal.set(Calendar.DAY_OF_MONTH, 1);
-                        beginCal.set(Calendar.MONTH, 5);
+                        beginCal.set(Calendar.MONTH, 8);
                         beginCal.set(Calendar.YEAR, 2023);
 
 
                         Calendar endCal = Calendar.getInstance();
                         endCal.set(Calendar.DAY_OF_MONTH, 1);
-                        endCal.set(Calendar.MONTH, 6);
+                        endCal.set(Calendar.MONTH, 10);
                         endCal.set(Calendar.YEAR, 2023);
-
-                        final UsageEvents events = usageManager.queryEvents(beginCal.getTimeInMillis(), endCal.getTimeInMillis());
-
-
-                        AsyncTask.execute(new Runnable() {
-                            @Override
-                            public void run() {
-                                grab_stats(events, file);
-                            }
-                        });
+                        if(begin != null && end != null) {
+                            Log.i("AppUsageEvents", "begining or end is null");
+                            final UsageEvents events = usageManager.queryEvents(beginCal.getTimeInMillis(), endCal.getTimeInMillis());
+                            AsyncTask.execute(new Runnable() {
+                                @Override
+                                public void run() {
+                                    grab_stats(events, file);
+                                }
+                            });
+                        }else{
+                            final UsageEvents events = usageManager.queryEvents(begin.getTimeInMillis(), end.getTimeInMillis());
+                            Log.i("AppUsageEvents", "begin and end are not null");
+                            AsyncTask.execute(new Runnable() {
+                                @Override
+                                public void run() {
+                                    grab_stats(events, file);
+                                }
+                            });
+                        }
                     }catch(Exception e) {
                         Log.e("UsageStats", e.getMessage());
                     }
@@ -119,6 +138,45 @@ public class AppStatsCollector extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_app_stats_collector);
 
+        navView = findViewById(R.id.nav_view);
+        navView.setNavigationItemSelectedListener(new MenuListener(this, navView));
+
+        Button open_menu = findViewById(R.id.open_menu);
+        open_menu.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(navView.getVisibility() == View.VISIBLE) {
+                    navView.setVisibility(View.GONE);
+                }else{
+                    navView.setVisibility(View.VISIBLE);
+                }
+            }
+        });
+
+        beginView = findViewById(R.id.beginDate);
+        endView = findViewById(R.id.endDate);
+        begin = Calendar.getInstance();
+        end = Calendar.getInstance();
+
+        beginView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
+            @Override
+            public void onSelectedDayChange(@NonNull CalendarView view, int year, int month, int dayOfMonth) {
+
+                begin.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+                begin.set(Calendar.MONTH, month);
+                begin.set(Calendar.YEAR, year);
+            }
+        });
+
+        endView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
+            @Override
+            public void onSelectedDayChange(@NonNull CalendarView view, int year, int month, int dayOfMonth) {
+
+                end.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+                end.set(Calendar.MONTH, month);
+                end.set(Calendar.YEAR, year);
+            }
+        });
         usageManager = (UsageStatsManager)this.getSystemService(Context.USAGE_STATS_SERVICE);
         database = new AppUsageDBHelper(this).getWritableDatabase();
 
@@ -133,7 +191,7 @@ public class AppStatsCollector extends AppCompatActivity {
                         android.os.Process.myUid(), context.getPackageName());
                 boolean granted = mode == AppOpsManager.MODE_ALLOWED;
                 Log.i("AppUSageStats", "about to launch activity");
-                Toast.makeText(AppStatsCollector.this, "about to lauch activity", Toast.LENGTH_LONG);
+                Toast.makeText(AppStatsCollector.this,  "about to launch activity", Toast.LENGTH_LONG);
                 if(granted) {
                     getFileLauncher.launch(null);
                 }else{

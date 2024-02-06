@@ -1,6 +1,7 @@
 package org.philosophism.openmhealth;
 
 import org.philosophism.openmhealth.api.contracts.SleepContract;
+import org.philosophism.openmhealth.utils.MenuListener;
 import org.philosophism.openmhealth.utils.Metric;
 import static android.database.Cursor.FIELD_TYPE_BLOB;
 import static android.database.Cursor.FIELD_TYPE_FLOAT;
@@ -56,6 +57,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.util.Hex;
+import com.google.android.material.navigation.NavigationView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -92,6 +94,7 @@ public class DataManager extends AppCompatActivity {
     MetaData metadata;
     Uri filename;
     Metric current = null;
+    NavigationView navView;
 
     private final ActivityResultLauncher getDirLauncher = registerForActivityResult(
             new ActivityResultContracts.CreateDocument(),
@@ -118,15 +121,15 @@ public class DataManager extends AppCompatActivity {
                     /// should show reason why its required
                 }
             });
-
+    // address for sms phone number, number for call log phone number
     Metric[] metric_list = new Metric[]{
-            new Metric("incoming_SMS", Manifest.permission.READ_SMS, "content://sms/inbox",
-                    new String[]{"date", "date_sent", "thread_id", "address", "body"},
+            new Metric("incoming SMS", Manifest.permission.READ_SMS, "content://sms/inbox",
+                    new String[]{"date", "date_sent", "thread_id", "address"},
                     new String[]{"date", "thread_id"}),
             new Metric("calllog", Manifest.permission.READ_CALL_LOG, "content://call_log/calls",
-                    new String[]{"number", "date", "duration"},
+                    new String[]{"date", "number", "duration"},
                     new String[]{"date", "duration"}),
-            new Metric("sleep data", Manifest.permission.ACTIVITY_RECOGNITION, SleepContract.CONTENT_URI, new String[] {
+           /* new Metric("sleep data", Manifest.permission.ACTIVITY_RECOGNITION, SleepContract.CONTENT_URI, new String[] {
                     SleepContract._ID,
                     SleepContract.DATE,
                     SleepContract.END_DATE,
@@ -135,7 +138,7 @@ public class DataManager extends AppCompatActivity {
                     SleepContract.BRIGHTNESS,
                     SleepContract.MOTION,
                     SleepContract.IS_EVENT
-            }),
+            }),*/
             new Metric("calendar", Manifest.permission.READ_CALENDAR,  CalendarContract.Events.CONTENT_URI,
                     new String[] {
                             CalendarContract.Events._ID,
@@ -224,6 +227,20 @@ public class DataManager extends AppCompatActivity {
         metadata = new MetaData(metadata_id, device_id, participant_id);
         LinearLayout checklist = findViewById(R.id.checklist);
 
+        navView = findViewById(R.id.nav_view);
+        navView.setNavigationItemSelectedListener(new MenuListener(this, navView));
+
+        Button open_menu = findViewById(R.id.open_menu);
+        open_menu.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(navView.getVisibility() == View.VISIBLE) {
+                    navView.setVisibility(View.GONE);
+                }else{
+                    navView.setVisibility(View.VISIBLE);
+                }
+            }
+        });
 
         for(int i = 0; i < metric_list.length; i++) {
             Button btn = new Button(this);
